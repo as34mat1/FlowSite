@@ -4,78 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2D Board with Draggable Sprite</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: white;
-        }
-        .board {
-            width: 500px;
-            height: 500px;
-            background-color: lightgray;
-            border: 5px solid #333;
-            position: relative;
-        }
-        .sprite {
-            width: 50px;
-            height: 50px;
-            background-color: gray;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            cursor: grab;
-            border-radius: 5px;
-            border : 3px solid #333
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="board" id="board">
     <div class="sprite" id="sprite"></div>
 </div>
-
-<script>
-    const sprite = document.getElementById('sprite');
-    const board = document.getElementById('board');
-
-    let offsetX, offsetY;
-
-    sprite.addEventListener('mousedown', (e) => {
-        offsetX = e.clientX - sprite.getBoundingClientRect().left;
-        offsetY = e.clientY - sprite.getBoundingClientRect().top;
-
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
-    });
-
-    function onMouseMove(e) {
-        const boardRect = board.getBoundingClientRect();
-        let newX = e.clientX - boardRect.left - offsetX;
-        let newY = e.clientY - boardRect.top - offsetY;
-
-        const minX = 27;
-        const minY = 27;
-        const maxX = board.offsetWidth - sprite.offsetWidth + 18;
-        const maxY = board.offsetHeight - sprite.offsetHeight + 18;
-
-        if (newX < minX) newX = minX;
-        if (newY < minY) newY = minY;
-        if (newX > maxX) newX = maxX;
-        if (newY > maxY) newY = maxY;
-
-        sprite.style.left = newX + 'px';
-        sprite.style.top = newY + 'px';
-    }
-
-    function onMouseUp() {
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
-    }
-</script>
+<script src="script.js"></script>
 </body>
 </html>
