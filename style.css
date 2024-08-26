@@ -168,7 +168,7 @@ body {
     border-bottom: 50px solid #e0d679;
     position: absolute;
     top: calc(50% + 4px);
-    left: calc(50% - 24px);
+    left: calc(50% - 25px);
     z-index: 1;
 }
 
