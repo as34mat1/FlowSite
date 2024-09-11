@@ -1,3 +1,4 @@
+/* General Styles */
 body {
     margin: 0;
     padding: 0;
@@ -8,11 +9,22 @@ body {
     background-color: white;
 }
 
+.project-logo {
+    position: absolute;
+    width: 100px;
+    height: 50px;
+    left: 10px;
+    top: 10px;
+    display: block;
+    background: url("logo.png") no-repeat center center;
+}
+
 .layout {
     display: flex;
     align-items: flex-start;
 }
 
+/* Left Panel */
 .left-panel {
     display: flex;
     flex-direction: column;
@@ -22,230 +34,164 @@ body {
 }
 
 .color-picker {
-    width: 162px; /* Width of the color-picker */
-    padding: 20px; /* Add padding for spacing */
+    width: 162px;
+    padding: 20px;
     border: 1px solid #333;
-    position: absolute;
-    left: -220px;
-    display: none;
+    display: flex;
     flex-direction: column;
-    align-items: center; /* Align content center */
-}
-
-/* Ensure color-picker shows on hover over left-panel or color-picker itself */
-.left-panel:hover .color-picker,
-.color-picker:hover {
-    display: flex; /* Show the color-picker when hovering over the left-panel or the color-picker */
+    align-items: center;
+    z-index: 1000;
+    position: absolute;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .plus-button {
     width: 30px;
     height: 30px;
-    position: absolute;
-    background-color: #333;
-    border-radius: 50%;
-    border: 20px transparent;
-    cursor: pointer;
-    margin-right: 40px;
-    margin-top: 650px;
+    background-size: contain;
+    background: url('assets/plus-button.svg') no-repeat center center;
 }
 
+/* Board */
 .board {
-    width: 856px;
-    height: 856px;
     background: url('board.png') no-repeat center center;
+    background-size: cover;
     position: relative;
+    width: 80vw;
+    height: 80vw;
+    max-width: 80vh;
+    max-height: 80vh;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
+/* Sprite Styling */
 .sprite {
-    width: 50px;
-    height: 50px;
-    position: relative;
+    position: absolute;
     cursor: grab;
     display: flex;
     justify-content: flex-end;
     align-items: flex-end;
+    border-radius: 4px;
+    transition: transform 0.2s ease;
 }
 
 .sprite-overlay {
     position: absolute;
     top: 0;
     left: 0;
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
+    width: 100%;
+    height: 100%;
     background: transparent;
-    z-index: 1; /* Ensure it's above the sprite but below the trashcan */
+    z-index: 1;
+}
+
+.trashcan, .rotation {
+    position: absolute;
+    bottom: 0;
+    background-size: contain;
+    cursor: pointer;
+    display: none;
+    border-radius: 50%;
+    border: 2px solid gray;
+    z-index: 100;
+    background-color: white;
 }
 
 .trashcan {
-    position: absolute;
-    bottom: 0;
     right: 0;
-    width: 20px;
-    height: 20px;
-    background: url('trashcan-icon-removebg-preview.png') no-repeat center center;
-    background-size: contain;
-    cursor: pointer;
-    display: none;
-    border-radius: 50%;
-    border: 2px solid gray;
-    z-index: 100;
-}
-
-/* Ensure trashcan appears when hovering over the overlay */
-.sprite-overlay:hover + .trashcan {
-    display: block; /* Show trashcan on hover */
-}
-
-.sprite-arrow {
-    position: absolute;
-    width: 25px; /* Adjust size as needed */
-    height: 25px; /* Adjust size as needed */
-    top: 12px; /* Adjust based on sprite size */
-    left: 12px;
-    background: url('Arrow-Up-icon-removebg-preview.png') no-repeat center center;
-    background-size: contain;
-    display: block;
-    z-index: 100;
+    background: url('assets/trashcan.svg') no-repeat center center;
 }
 
 .rotation {
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    bottom: 0;
     left: 0;
-    background: url('rotation-removebg-preview.png') no-repeat center center;
-    background-size: contain;
-    cursor: pointer;
-    display: none;
-    border-radius: 50%;
-    border: 2px solid gray;
-    z-index: 100;
+    background: url('assets/rotation.svg') no-repeat center center;
 }
 
+/* Show controls on hover */
+.sprite-overlay:hover + .trashcan,
+.sprite-overlay:hover + .rotation {
+    display: block;
+}
 
 .sprite-name {
     position: absolute;
-    left: 50%;
-    margin-right: 30px;
-    margin-top: -20px;
     transform: translateX(-50%);
     font-size: 14px;
     font-weight: bold;
     text-align: center;
     white-space: nowrap;
-    z-index: 1;
+    z-index: 2;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 2px 6px;
+    border-radius: 4px;
 }
 
-.square {
-    background-color: #90c29e;
+/* Hidden by default */
+.square, .triangle, .circle {
     display: none;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border-radius: 5px;
-    border: 2px solid #333;
 }
 
-.triangle-container {
-    display: none;
-    width: 0;
-    height: 0;
-    border-left: 28px solid transparent;
-    border-right: 28px solid transparent;
-    border-bottom: 56px solid black;
-    position: relative;
-}
-
-.triangle {
-    display: none;
-    width: 0;
-    height: 0;
-    border-left: 25px solid transparent;
-    border-right: 25px solid transparent;
-    border-bottom: 50px solid #e0d679;
-    position: absolute;
-    top: calc(50% + 4px);
-    left: calc(50% - 25px);
-    z-index: 1;
-}
-
-.circle {
-    display: none;
-    background-color: #d44570;
-    border-radius: 50%;
-    top: 10%;
-    left: 80%;
-    border: 2px solid #333;
-}
-
+/* Color Picker and Shapes */
 .palette-container {
     display: flex;
     gap: 20px;
     margin-top: 20px;
+    z-index: 1000;
 }
 
-.palette {
+.color-circles, .color-triangles, .color-square {
     display: flex;
     flex-direction: column;
     gap: 10px;
-}
-
-.color {
-    width: 36px;
-    height: 36px;
-    cursor: pointer;
-    border-radius: 10px;
-    position: relative;
-    background-color: transparent;
-    border: 2px solid #333;
-}
-
-.color-circles, .color-triangles {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.color-circle {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    border: 2px solid #333;
-    background-color: transparent;
-    cursor: pointer;
-}
-
-.color-triangle-border {
-    width: 0;
-    height: 0;
-    border-left: 20px solid transparent;
-    border-right: 20px solid transparent;
-    border-bottom: 40px solid #333;
     cursor: pointer;
     position: relative;
+    border: 1px solid black;
+    background-color: transparent;
+    z-index: 1000;
 }
 
-.color-triangle {
-    width: 0;
-    height: 0;
-    border-left: 17px solid transparent;
-    border-right: 17px solid transparent;
-    border-bottom: 34px solid transparent;
-    position: absolute;
-    top: calc(50% + 4px);
-    left: calc(50% - 17px);
-}
+/* Shape Backgrounds */
+[data-square="s1"] { background: url("Elementy 6 kolorow/kwadrat_1.svg") no-repeat center center; }
+[data-square="s2"] { background: url("Elementy 6 kolorow/kwadrat_2.svg") no-repeat center center; }
+[data-square="s3"] { background: url("Elementy 6 kolorow/kwadrat_3.svg") no-repeat center center; }
+[data-square="s4"] { background: url("Elementy 6 kolorow/kwadrat_4.svg") no-repeat center center; }
+[data-square="s5"] { background: url("Elementy 6 kolorow/kwadrat_5.svg") no-repeat center center; }
+[data-square="s6"] { background: url("Elementy 6 kolorow/kwadrat_6.svg") no-repeat center center; }
 
-[data-color="black"] { background-color: #252321; }
-[data-color="white"] { background-color: #f9f9f9; }
-[data-color="lightbrown"] { background-color: #c07d57; }
-[data-color="blue"] { background-color: #71b6b2; }
-[data-color="lightgreen"] { background-color: #90c29e; }
-[data-color="lightpurple"] { background-color: #9d6d9e; }
-[data-color="pink"] { background-color: #d44570; }
-[data-color="lightyellow"] { background-color: #e0d679; }
-[data-color="lightblue"] { background-color: #89cad3; }
-[data-color="lightgreen2"] { background-color: #94cd5b; }
+[data-square_bz="s1"] { background: url("Elementy bez znacznika/kwadrat_bz_1.svg") no-repeat center center; }
+[data-square_bz="s2"] { background: url("Elementy bez znacznika/kwadrat_bz_2.svg") no-repeat center center; }
+[data-square_bz="s3"] { background: url("Elementy bez znacznika/kwadrat_bz_3.svg") no-repeat center center; }
+[data-square_bz="s4"] { background: url("Elementy bez znacznika/kwadrat_bz_4.svg") no-repeat center center; }
+[data-square_bz="s5"] { background: url("Elementy bez znacznika/kwadrat_bz_5.svg") no-repeat center center; }
+[data-square_bz="s6"] { background: url("Elementy bez znacznika/kwadrat_bz_6.svg") no-repeat center center; }
+
+[data-circle="c1"] { background: url("Elementy 6 kolorow/kolo_1.svg") no-repeat center center; }
+[data-circle="c2"] { background: url("Elementy 6 kolorow/kolo_2.svg") no-repeat center center; }
+[data-circle="c3"] { background: url("Elementy 6 kolorow/kolo_3.svg") no-repeat center center; }
+[data-circle="c4"] { background: url("Elementy 6 kolorow/kolo_4.svg") no-repeat center center; }
+[data-circle="c5"] { background: url("Elementy 6 kolorow/kolo_5.svg") no-repeat center center; }
+[data-circle="c6"] { background: url("Elementy 6 kolorow/kolo_6.svg") no-repeat center center; }
+
+[data-circle_bz="c1"] { background: url("Elementy bez znacznika/kolo_bz_1.svg") no-repeat center center; }
+[data-circle_bz="c2"] { background: url("Elementy bez znacznika/kolo_bz_2.svg") no-repeat center center; }
+[data-circle_bz="c3"] { background: url("Elementy bez znacznika/kolo_bz_3.svg") no-repeat center center; }
+[data-circle_bz="c4"] { background: url("Elementy bez znacznika/kolo_bz_4.svg") no-repeat center center; }
+[data-circle_bz="c5"] { background: url("Elementy bez znacznika/kolo_bz_5.svg") no-repeat center center; }
+[data-circle_bz="c6"] { background: url("Elementy bez znacznika/kolo_bz_6.svg") no-repeat center center; }
+
+[data-triangle="t1"] { background: url("Elementy 6 kolorow/trojkat_1.svg") no-repeat center center; }
+[data-triangle="t2"] { background: url("Elementy 6 kolorow/trojkat_2.svg") no-repeat center center; }
+[data-triangle="t3"] { background: url("Elementy 6 kolorow/trojkat_3.svg") no-repeat center center; }
+[data-triangle="t4"] { background: url("Elementy 6 kolorow/trojkat_4.svg") no-repeat center center; }
+[data-triangle="t5"] { background: url("Elementy 6 kolorow/trojkat_5.svg") no-repeat center center; }
+[data-triangle="t6"] { background: url("Elementy 6 kolorow/trojkat_6.svg") no-repeat center center; }
+
+[data-triangle_bz="t1"] { background: url("Elementy bez znacznika/trojkat_bz_1.svg") no-repeat center center; }
+[data-triangle_bz="t2"] { background: url("Elementy bez znacznika/trojkat_bz_2.svg") no-repeat center center; }
+[data-triangle_bz="t3"] { background: url("Elementy bez znacznika/trojkat_bz_3.svg") no-repeat center center; }
+[data-triangle_bz="t4"] { background: url("Elementy bez znacznika/trojkat_bz_4.svg") no-repeat center center; }
+[data-triangle_bz="t5"] { background: url("Elementy bez znacznika/trojkat_bz_5.svg") no-repeat center center; }
+[data-triangle_bz="t6"] { background: url("Elementy bez znacznika/trojkat_bz_6.svg") no-repeat center center; }
