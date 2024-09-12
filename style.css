@@ -16,7 +16,6 @@ body {
     left: 10px;
     top: 10px;
     display: block;
-    background: url("logo.png") no-repeat center center;
 }
 
 .layout {
@@ -36,6 +35,7 @@ body {
 .color-picker {
     width: 162px;
     padding: 20px;
+    right: -200px;
     border: 1px solid #333;
     display: flex;
     flex-direction: column;
@@ -49,8 +49,27 @@ body {
 .plus-button {
     width: 30px;
     height: 30px;
-    background-size: contain;
-    background: url('assets/plus-button.svg') no-repeat center center;
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    overflow: visible;
+    z-index: 1000;
+}
+
+.plus-button svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    pointer-events: auto;
+    z-index: 1000;
 }
 
 /* Board */
@@ -58,13 +77,12 @@ body {
     background: url('board.png') no-repeat center center;
     background-size: cover;
     position: relative;
-    width: 80vw;
-    height: 80vw;
-    max-width: 80vh;
-    max-height: 80vh;
-    border: 2px solid #ccc;
-    border-radius: 8px;
+    width: 60vw;
+    height: 60vw;
+    max-width: 60vh;
+    max-height: 60vh;
     overflow: hidden;
+    z-index: 1; /* Lower z-index so sprites appear on top */
 }
 
 /* Sprite Styling */
@@ -72,58 +90,58 @@ body {
     position: absolute;
     cursor: grab;
     display: flex;
-    justify-content: flex-end;
-    align-items: flex-end;
-    border-radius: 4px;
-    transition: transform 0.2s ease;
+    justify-content: center;
+    align-items: center;
+    z-index: 999; /* Higher z-index than the board */
+    background-color: transparent;
+    overflow: visible;
 }
 
-.sprite-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
+.sprite img {
     width: 100%;
     height: 100%;
-    background: transparent;
-    z-index: 1;
+    display: block;
+    pointer-events: none;
 }
 
-.trashcan, .rotation {
+/* Trashcan and Rotation Icons */
+/* Trashcan and Rotation Icons */
+.sprite .trashcan,
+.sprite .rotation {
     position: absolute;
     bottom: 0;
-    background-size: contain;
     cursor: pointer;
-    display: none;
-    border-radius: 50%;
-    border: 2px solid gray;
-    z-index: 100;
-    background-color: white;
+    display: none; /* Initially hidden */
+    z-index: 1000; /* Ensure icons are above other elements */
+    width: 20px;  /* Adjust size if necessary */
+    height: 20px; /* Adjust size if necessary */
 }
 
-.trashcan {
-    right: 0;
-    background: url('assets/trashcan.svg') no-repeat center center;
+.sprite .trashcan {
+    right: 0; /* Position at the bottom right */
 }
 
-.rotation {
-    left: 0;
-    background: url('assets/rotation.svg') no-repeat center center;
+.sprite .rotation {
+    left: 0; /* Position at the bottom left */
 }
 
-/* Show controls on hover */
-.sprite-overlay:hover + .trashcan,
-.sprite-overlay:hover + .rotation {
-    display: block;
+/* Show controls when hovering over the sprite */
+.sprite:hover .trashcan,
+.sprite:hover .rotation {
+    display: block; /* Show icons on hover */
 }
+
 
 .sprite-name {
     position: absolute;
+    top: -20px;
+    left: 50%;
     transform: translateX(-50%);
     font-size: 14px;
     font-weight: bold;
     text-align: center;
     white-space: nowrap;
-    z-index: 2;
+    z-index: 150;
     background-color: rgba(255, 255, 255, 0.8);
     padding: 2px 6px;
     border-radius: 4px;
@@ -132,6 +150,7 @@ body {
 /* Hidden by default */
 .square, .triangle, .circle {
     display: none;
+    z-index: 999;
 }
 
 /* Color Picker and Shapes */
@@ -142,56 +161,30 @@ body {
     z-index: 1000;
 }
 
+/* Shape Container */
 .color-circles, .color-triangles, .color-square {
     display: flex;
     flex-direction: column;
-    gap: 10px;
     cursor: pointer;
     position: relative;
-    border: 1px solid black;
     background-color: transparent;
+    gap: 10px;
     z-index: 1000;
 }
 
-/* Shape Backgrounds */
-[data-square="s1"] { background: url("Elementy 6 kolorow/kwadrat_1.svg") no-repeat center center; }
-[data-square="s2"] { background: url("Elementy 6 kolorow/kwadrat_2.svg") no-repeat center center; }
-[data-square="s3"] { background: url("Elementy 6 kolorow/kwadrat_3.svg") no-repeat center center; }
-[data-square="s4"] { background: url("Elementy 6 kolorow/kwadrat_4.svg") no-repeat center center; }
-[data-square="s5"] { background: url("Elementy 6 kolorow/kwadrat_5.svg") no-repeat center center; }
-[data-square="s6"] { background: url("Elementy 6 kolorow/kwadrat_6.svg") no-repeat center center; }
+/* Individual Shape Styling */
+.color-circles > div,
+.color-triangles > div,
+.color-square > div {
+    display: block;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+}
 
-[data-square_bz="s1"] { background: url("Elementy bez znacznika/kwadrat_bz_1.svg") no-repeat center center; }
-[data-square_bz="s2"] { background: url("Elementy bez znacznika/kwadrat_bz_2.svg") no-repeat center center; }
-[data-square_bz="s3"] { background: url("Elementy bez znacznika/kwadrat_bz_3.svg") no-repeat center center; }
-[data-square_bz="s4"] { background: url("Elementy bez znacznika/kwadrat_bz_4.svg") no-repeat center center; }
-[data-square_bz="s5"] { background: url("Elementy bez znacznika/kwadrat_bz_5.svg") no-repeat center center; }
-[data-square_bz="s6"] { background: url("Elementy bez znacznika/kwadrat_bz_6.svg") no-repeat center center; }
-
-[data-circle="c1"] { background: url("Elementy 6 kolorow/kolo_1.svg") no-repeat center center; }
-[data-circle="c2"] { background: url("Elementy 6 kolorow/kolo_2.svg") no-repeat center center; }
-[data-circle="c3"] { background: url("Elementy 6 kolorow/kolo_3.svg") no-repeat center center; }
-[data-circle="c4"] { background: url("Elementy 6 kolorow/kolo_4.svg") no-repeat center center; }
-[data-circle="c5"] { background: url("Elementy 6 kolorow/kolo_5.svg") no-repeat center center; }
-[data-circle="c6"] { background: url("Elementy 6 kolorow/kolo_6.svg") no-repeat center center; }
-
-[data-circle_bz="c1"] { background: url("Elementy bez znacznika/kolo_bz_1.svg") no-repeat center center; }
-[data-circle_bz="c2"] { background: url("Elementy bez znacznika/kolo_bz_2.svg") no-repeat center center; }
-[data-circle_bz="c3"] { background: url("Elementy bez znacznika/kolo_bz_3.svg") no-repeat center center; }
-[data-circle_bz="c4"] { background: url("Elementy bez znacznika/kolo_bz_4.svg") no-repeat center center; }
-[data-circle_bz="c5"] { background: url("Elementy bez znacznika/kolo_bz_5.svg") no-repeat center center; }
-[data-circle_bz="c6"] { background: url("Elementy bez znacznika/kolo_bz_6.svg") no-repeat center center; }
-
-[data-triangle="t1"] { background: url("Elementy 6 kolorow/trojkat_1.svg") no-repeat center center; }
-[data-triangle="t2"] { background: url("Elementy 6 kolorow/trojkat_2.svg") no-repeat center center; }
-[data-triangle="t3"] { background: url("Elementy 6 kolorow/trojkat_3.svg") no-repeat center center; }
-[data-triangle="t4"] { background: url("Elementy 6 kolorow/trojkat_4.svg") no-repeat center center; }
-[data-triangle="t5"] { background: url("Elementy 6 kolorow/trojkat_5.svg") no-repeat center center; }
-[data-triangle="t6"] { background: url("Elementy 6 kolorow/trojkat_6.svg") no-repeat center center; }
-
-[data-triangle_bz="t1"] { background: url("Elementy bez znacznika/trojkat_bz_1.svg") no-repeat center center; }
-[data-triangle_bz="t2"] { background: url("Elementy bez znacznika/trojkat_bz_2.svg") no-repeat center center; }
-[data-triangle_bz="t3"] { background: url("Elementy bez znacznika/trojkat_bz_3.svg") no-repeat center center; }
-[data-triangle_bz="t4"] { background: url("Elementy bez znacznika/trojkat_bz_4.svg") no-repeat center center; }
-[data-triangle_bz="t5"] { background: url("Elementy bez znacznika/trojkat_bz_5.svg") no-repeat center center; }
-[data-triangle_bz="t6"] { background: url("Elementy bez znacznika/trojkat_bz_6.svg") no-repeat center center; }
+.color-circles > div img,
+.color-triangles > div img,
+.color-square > div img {
+    width: 100%;
+    height: auto;
+}

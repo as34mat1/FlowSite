@@ -3,104 +3,136 @@ const colorCirclesContainer = document.getElementById('colorCircles');
 const colorTrianglesContainer = document.getElementById('colorTriangles');
 const colorSquaresContainer = document.getElementById('colorSquares');
 const spriteNameInput = document.getElementById('sprite-name-input');
+const plusButton = document.querySelector('.plus-button');
+const paletteContainer = document.querySelector('.color-picker');
 
 // Event listeners for spawning shapes
 const shapeContainers = [
-    { container: colorCirclesContainer, shapeClass: 'color-circle', type: 'circle' },
-    { container: colorTrianglesContainer, shapeClass: 'color-triangle', type: 'triangle' },
-    { container: colorSquaresContainer, shapeClass: 'color-square', type: 'square' },
+    { container: colorCirclesContainer, shapeClass: 'ko_shape_bz', type: 'circle' },
+    { container: colorTrianglesContainer, shapeClass: 't_shape_bz', type: 'triangle' },
+    { container: colorSquaresContainer, shapeClass: 'kw_shape_bz', type: 'square' },
 ];
 
 shapeContainers.forEach(({ container, shapeClass, type }) => {
-    container.addEventListener('mousedown', (e) => {
-        if (e.target.classList.contains(shapeClass)) {
-            const backgroundImage = getComputedStyle(e.target).backgroundImage;
-            spawnShapeAtCursor(type, backgroundImage);
+    container.addEventListener('click', (e) => {
+        if (e.target.tagName === 'IMG') {
+            const imageSrc = e.target.getAttribute('src');
+            console.log(`Spawning ${type} on board with image: ${imageSrc}`);
+            spawnShapeOnBoard(type, imageSrc);
         }
     });
 });
 
-// Resize color elements when window size changes
 function resizeElements() {
     const boardSize = board.offsetWidth;
     const elementSize = boardSize / 25;
 
-    document.querySelectorAll('.color-square, .color-circle, .color-triangle').forEach(element => {
+    document.querySelectorAll('.color-square img, .color-circle img, .color-triangle img').forEach(element => {
         element.style.width = `${elementSize}px`;
         element.style.height = `${elementSize}px`;
     });
+
+    console.log("Resized elements based on board size.");
 }
 
 window.addEventListener('resize', resizeElements);
 resizeElements();
 
-// Resize the board and sprites when window size changes
 function resizeBoard() {
     const size = window.innerHeight * 0.6;
     board.style.width = `${size}px`;
     board.style.height = `${size}px`;
     resizeSprites();
+    console.log("Resized the board and sprites.");
 }
 
 window.addEventListener('resize', resizeBoard);
 window.addEventListener('load', resizeBoard);
 
-// Spawn shape at cursor
-function spawnShapeAtCursor(shapeType, backgroundImage) {
+function togglePaletteVisibility() {
+    if (paletteContainer.style.display === 'none' || paletteContainer.style.display === '') {
+        paletteContainer.style.display = 'flex'; // Show the palette
+        plusButton.querySelector('img').src = 'assets/x-button.svg'; // Change to x-button.svg
+    } else {
+        paletteContainer.style.display = 'none'; // Hide the palette
+        plusButton.querySelector('img').src = 'assets/plus-button.svg'; // Change back to plus-button.svg
+    }
+}
+
+// Add an event listener to the plus button to toggle the palette visibility
+plusButton.addEventListener('click', togglePaletteVisibility);
+
+// Initially hide the palette container
+paletteContainer.style.display = 'none';
+
+function spawnShapeOnBoard(shapeType, imageSrc) {
     const spriteName = spriteNameInput.value.trim();
     const spriteSize = board.getBoundingClientRect().width / 15;
-    const sprite = createShapeElement(shapeType, backgroundImage, spriteSize);
+    const sprite = createShapeElement(shapeType, imageSrc, spriteSize);
 
-    // Name label for the sprite if provided
     if (spriteName) {
         addNameLabel(sprite, spriteName);
         spriteNameInput.value = '';
     }
 
-    document.body.appendChild(sprite);
+    sprite.style.display = 'flex'; // Ensure the sprite is displayed as a flex element
+    board.appendChild(sprite); // Append sprite to the board
     makeSpriteDraggable(sprite);
     resizeSprites();
+
+    console.log(`Spawned a ${shapeType} on the board.`);
 }
 
-// Create shape element based on type
-function createShapeElement(shapeType, backgroundImage, size) {
+function createShapeElement(shapeType, imageSrc, size) {
     const sprite = document.createElement('div');
     sprite.className = `sprite ${shapeType}`;
-    sprite.style.backgroundImage = backgroundImage;
     sprite.style.width = `${size}px`;
     sprite.style.height = `${size}px`;
     sprite.style.position = 'absolute';
+    sprite.style.display = 'flex'; // Ensure it displays
+    sprite.style.backgroundColor = 'transparent'; // Ensure no background color
+
+    const img = document.createElement('img');
+    img.src = imageSrc;
+    img.style.width = '100%';
+    img.style.height = '100%';
+    sprite.appendChild(img);
 
     const { left, width, top, height } = board.getBoundingClientRect();
-    sprite.style.left = `${left + width / 2 - size / 2}px`;
-    sprite.style.top = `${top + height / 2 - size / 2}px`;
+    sprite.style.left = `${width / 2 - size / 2}px`; // Adjusted to center within the board
+    sprite.style.top = `${height / 2 - size / 2}px`; // Adjusted to center within the board
 
     createSpriteControls(sprite, size);
+    console.log(`Created a ${shapeType} element with image: ${imageSrc} at position (${sprite.style.left}, ${sprite.style.top}).`);
+
     return sprite;
 }
 
-// Add name label to sprite
 function addNameLabel(sprite, name) {
     const nameLabel = document.createElement('div');
     nameLabel.className = 'sprite-name';
     nameLabel.innerText = name;
     sprite.appendChild(nameLabel);
+    console.log(`Added name label: ${name}`);
 }
 
-// Add trashcan and rotation controls to a sprite
 function createSpriteControls(sprite, size) {
     const overlay = document.createElement('div');
     overlay.className = 'sprite-overlay';
 
-    const trashcan = createControl('trashcan', size, () => document.body.removeChild(sprite));
+    const trashcan = createControl('trashcan', size, () => {
+        board.removeChild(sprite);
+        console.log("Sprite removed from board.");
+    });
+
     const rotation = createControl('rotation', size);
 
     sprite.appendChild(overlay);
     sprite.appendChild(trashcan);
     sprite.appendChild(rotation);
+    console.log("Added controls to sprite.");
 }
 
-// Create a control element
 function createControl(className, size, onClick = null) {
     const control = document.createElement('div');
     control.className = className;
@@ -111,10 +143,11 @@ function createControl(className, size, onClick = null) {
     if (className === 'rotation') control.style.left = `-${size / 6}px`;
 
     if (onClick) control.addEventListener('click', onClick);
+    console.log(`Created control: ${className}`);
+
     return control;
 }
 
-// Resize all sprites on the board
 function resizeSprites() {
     const boardRect = board.getBoundingClientRect();
     const spriteSize = boardRect.width / 15;
@@ -130,28 +163,37 @@ function resizeSprites() {
             control.style.height = `${buttonSize}px`;
         });
     });
+
+    console.log("Resized all sprites on the board.");
 }
 
-// Enable dragging and rotating of sprites
 function makeSpriteDraggable(sprite) {
-    let isDragging = false, isRotating = false, startX, startY, offsetX, offsetY, rotationStartY, initialRotationAngle = 0;
+    let isDragging = false,
+        isRotating = false,
+        offsetX, offsetY, rotationStartY, initialRotationAngle = 0;
 
     const trashcan = sprite.querySelector('.trashcan');
     const rotation = sprite.querySelector('.rotation');
 
     sprite.addEventListener('mousedown', (e) => {
+        // Check if the click is on a control element
+        if (e.target === trashcan || e.target === rotation) return;
+
+        // Initialize dragging
         isDragging = true;
-        startX = e.clientX;
-        startY = e.clientY;
         const rect = sprite.getBoundingClientRect();
+
+        // Correct calculation of offset relative to the cursor's position on the sprite
         offsetX = e.clientX - rect.left;
         offsetY = e.clientY - rect.top;
 
-        trashcan.style.display = 'block';
-        rotation.style.display = 'block';
+        // Set a very high z-index while dragging
+        sprite.style.zIndex = '10000';
 
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
+
+        console.log("Started dragging sprite.");
     });
 
     function onMouseMove(e) {
@@ -160,21 +202,30 @@ function makeSpriteDraggable(sprite) {
             const newRotationAngle = initialRotationAngle - deltaY * 1.2;
             sprite.style.transform = `rotate(${newRotationAngle}deg)`;
         } else if (isDragging) {
-            const newX = e.clientX - offsetX;
-            const newY = e.clientY - offsetY;
-            const spriteRect = sprite.getBoundingClientRect();
-            const minX = 0, minY = 0, maxX = window.innerWidth - spriteRect.width, maxY = window.innerHeight - spriteRect.height;
+            // Get the board's bounding rect to adjust the positioning relative to the board
+            const boardRect = board.getBoundingClientRect();
 
-            sprite.style.left = `${Math.min(Math.max(newX, minX), maxX)}px`;
-            sprite.style.top = `${Math.min(Math.max(newY, minY), maxY)}px`;
+            // Directly position sprite under the cursor, considering the board's offset
+            const newX = e.clientX - boardRect.left - offsetX;
+            const newY = e.clientY - boardRect.top - offsetY;
+
+            // Allow sprite to move within the screen boundaries
+            sprite.style.left = `${newX}px`;
+            sprite.style.top = `${newY}px`;
         }
     }
 
     function onMouseUp() {
         isDragging = false;
         isRotating = false;
+
+        // Reset zIndex after dragging
+        sprite.style.zIndex = '100';
+
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
+
+        console.log("Stopped dragging or rotating sprite.");
     }
 
     rotation.addEventListener('mousedown', (e) => {
@@ -183,31 +234,12 @@ function makeSpriteDraggable(sprite) {
         const currentRotation = sprite.style.transform.match(/rotate\((.*)deg\)/);
         initialRotationAngle = currentRotation ? parseFloat(currentRotation[1]) : 0;
 
-        isDragging = false;
+        isDragging = false; // Prevent dragging while rotating
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
+
+        console.log("Started rotating sprite.");
     });
 }
 
-// Initialize color shapes
-window.addEventListener('load', () => {
-    initializeColorShapes('.ko_shape_bz', 'color-circle', colorCirclesContainer);
-    initializeColorShapes('.kw_shape_bz', 'color-square', colorSquaresContainer);
-    initializeColorShapes('.t_shape_bz', 'color-triangle', colorTrianglesContainer);
-});
 
-function initializeColorShapes(selector, className, container) {
-    const styleOptions = document.querySelectorAll(selector);
-    const spriteSize = container.clientWidth * 0.8; // Set size as a percentage of container width for better fit
-
-    styleOptions.forEach(styleOption => {
-        const shape = document.createElement('div');
-        shape.className = className;
-        shape.style.width = `${spriteSize}px`;
-        shape.style.height = `${spriteSize}px`;
-        shape.style.backgroundImage = getComputedStyle(styleOption).backgroundImage;
-        shape.style.margin = '5px auto'; // Center elements and space them properly
-        shape.style.display = 'block'; // Ensure each shape is displayed as a block element
-        container.appendChild(shape);
-    });
-}
