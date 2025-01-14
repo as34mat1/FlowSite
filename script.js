@@ -111,8 +111,18 @@ function spawnShapeOnBoard(shapeType, imageSrc, spriteId) {
         spriteNameInput.value = '';
     }
 
-    sprite.style.display = 'flex'; // Ensure the sprite is displayed as a flex element
-    board.appendChild(sprite); // Append sprite to the board
+    const boardRect = board.getBoundingClientRect();
+    const initialXPercent = 47; // Initial X position in % of the board's width
+    const initialYPercent = 5;  // Initial Y position in % of the board's height
+
+    sprite.dataset.xPercent = initialXPercent; // Save the position as %
+    sprite.dataset.yPercent = initialYPercent;
+
+    sprite.style.left = `${initialXPercent}%`; // Position using %
+    sprite.style.top = `${initialYPercent}%`;
+
+    sprite.style.display = 'flex';
+    board.appendChild(sprite);
     makeSpriteDraggable(sprite);
     resizeSprites();
 
@@ -245,16 +255,24 @@ function resizeSprites() {
     logo.style.width = `${logoSize}px`;
     logo.style.height = `${logoSize / 2.5}px`;
     logo.style.left = '10px';
-    logo.style.top = '10px'
+    logo.style.top = '10px';
 
     document.querySelectorAll('.sprite').forEach(sprite => {
-        const newWidth = baseSpriteSize * sprite.proportion; // Apply proportion to base size
-        const newHeight = baseSpriteSize * sprite.proportion; // Apply proportion to base size
+        const xPercent = parseFloat(sprite.dataset.xPercent);
+        const yPercent = parseFloat(sprite.dataset.yPercent);
+
+        const newX = (xPercent / 100) * boardRect.width;
+        const newY = (yPercent / 100) * boardRect.height;
+
+        sprite.style.left = `${newX}px`;
+        sprite.style.top = `${newY}px`;
+
+        const newWidth = baseSpriteSize * sprite.proportion;
+        const newHeight = baseSpriteSize * sprite.proportion;
 
         sprite.style.width = `${newWidth}px`;
         sprite.style.height = `${newHeight}px`;
 
-        // Resize controls (trashcan, rotation, size) accordingly
         ['trashcan', 'rotation', 'size'].forEach(controlClass => {
             const control = sprite.querySelector(`.${controlClass}`);
             const controlSize = newWidth / 3;
@@ -263,22 +281,15 @@ function resizeSprites() {
         });
     });
 
-    console.log("Resized all sprites on the board with proportion.");
+    console.log("Resized all sprites on the board using percentage-based positioning.");
 }
 
 function makeSpriteDraggable(sprite) {
     let isDragging = false,
-        isRotating = false,
-        isResizing = false,
-        offsetX, offsetY, rotationStartY, initialRotationAngle = 0,
-        initialHeight, initialWidth, startY;
-
-    const trashcan = sprite.querySelector('.trashcan');
-    const rotation = sprite.querySelector('.rotation');
-    const size = sprite.querySelector('.size');
+        offsetX, offsetY;
 
     sprite.addEventListener('mousedown', (e) => {
-        if (e.target === trashcan || e.target === rotation || e.target === size) return;
+        if (['trashcan', 'rotation', 'size'].includes(e.target.className)) return;
 
         isDragging = true;
         const rect = sprite.getBoundingClientRect();
@@ -292,89 +303,48 @@ function makeSpriteDraggable(sprite) {
         console.log("Started dragging sprite.");
     });
 
-    size.addEventListener('mousedown', (e) => {
-        // Start resizing when the size control is clicked
-        isResizing = true;
-        startY = e.clientY;
-        initialWidth = sprite.offsetWidth;
-        initialHeight = sprite.offsetHeight;
-        sprite.style.zIndex = '10000';
-
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
-
-        console.log("Started resizing sprite.");
-    });
-
     function onMouseMove(e) {
-        if (isRotating) {
-            const deltaY = e.clientY - rotationStartY;
-            const newRotationAngle = initialRotationAngle - deltaY * 1.2;
-            sprite.style.transform = `rotate(${newRotationAngle}deg)`;
-            TogetherJS.send({
-                type: 'rotate-shape',
-                spriteId: sprite.id,
-                angle: newRotationAngle
-            });
-        }
-        else if (isDragging) {
+        if (isDragging) {
             const boardRect = board.getBoundingClientRect();
-            const newX = e.clientX - boardRect.left - offsetX;
-            const newY = e.clientY - boardRect.top - offsetY;
-            sprite.style.left = `${newX}px`;
-            sprite.style.top = `${newY}px`;
+            const newX = (e.clientX - boardRect.left - offsetX) / boardRect.width * 100;
+            const newY = (e.clientY - boardRect.top - offsetY) / boardRect.height * 100;
+
+            sprite.dataset.xPercent = newX; // Save position as %
+            sprite.dataset.yPercent = newY;
+
+            sprite.style.left = `${newX}%`;
+            sprite.style.top = `${newY}%`;
 
             TogetherJS.send({
                 type: 'drag-move',
                 spriteId: sprite.id,
-                newX,
-                newY
+                xPercent: newX,
+                yPercent: newY
             });
-        }
-        else if (isResizing) {
-            const deltaY = startY - e.clientY;
-            const scaleFactor = deltaY / 200; // Adjust scaling sensitivity
-            sprite.proportion += scaleFactor; // Update the proportion value
-            sprite.proportion = Math.max(0.2, sprite.proportion); // Prevent proportion from going too low
-            resizeSprites(); // Now the proportion will be applied here
-            startY = e.clientY; // Reset startY to allow smooth resizing
         }
     }
 
     function onMouseUp() {
         isDragging = false;
-        isRotating = false;
-        isResizing = false;
         sprite.style.zIndex = '100';
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
 
-        console.log(`Stopped dragging or resizing sprite. Final proportion: ${sprite.proportion}`);
+        console.log("Stopped dragging sprite.");
     }
 
-    rotation.addEventListener('mousedown', (e) => {
-        isRotating = true;
-        rotationStartY = e.clientY;
-        const currentRotation = sprite.style.transform.match(/rotate\((.*)deg\)/);
-        initialRotationAngle = currentRotation ? parseFloat(currentRotation[1]) : 0;
-
-        isDragging = false;
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
-
-        console.log("Started rotating sprite.");
-    });
-
-    // Listen for TogetherJS drag and rotate events
     TogetherJS.hub.on('drag-move', function (msg) {
         if (!msg.sameUrl || msg.spriteId !== sprite.id) return;
-        sprite.style.left = `${msg.newX}px`;
-        sprite.style.top = `${msg.newY}px`;
-    });
 
-    TogetherJS.hub.on('rotate-shape', function (msg) {
-        if (!msg.sameUrl || msg.spriteId !== sprite.id) return;
-        sprite.style.transform = `rotate(${msg.angle}deg)`;
+        sprite.dataset.xPercent = msg.xPercent;
+        sprite.dataset.yPercent = msg.yPercent;
+
+        const boardRect = board.getBoundingClientRect();
+        const newX = (msg.xPercent / 100) * boardRect.width;
+        const newY = (msg.yPercent / 100) * boardRect.height;
+
+        sprite.style.left = `${newX}px`;
+        sprite.style.top = `${newY}px`;
     });
 }
 
