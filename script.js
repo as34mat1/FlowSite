@@ -65,6 +65,7 @@ TogetherJS.hub.on('spawn-shape', function (msg) {
         console.warn(`Sprite with ID ${msg.spriteId} already exists.`);
     }
 });
+
 resizeBoard();
 
 function resizeBoard() {
@@ -219,7 +220,6 @@ function createControl(className, size, onClick = null) {
     return control;
 }
 
-
 // Listen for TogetherJS remove-shape event
 TogetherJS.hub.on('remove-shape', function (msg) {
     if (!msg.sameUrl) return;
@@ -245,7 +245,7 @@ function resizeSprites() {
     logo.style.width = `${logoSize}px`;
     logo.style.height = `${logoSize / 2.5}px`;
     logo.style.left = '10px';
-    logo.style.top = '10px'
+    logo.style.top = '10px';
 
     document.querySelectorAll('.sprite').forEach(sprite => {
         const newWidth = baseSpriteSize * sprite.proportion; // Apply proportion to base size
@@ -337,6 +337,14 @@ function makeSpriteDraggable(sprite) {
             sprite.proportion += scaleFactor; // Update the proportion value
             sprite.proportion = Math.max(0.2, sprite.proportion); // Prevent proportion from going too low
             resizeSprites(); // Now the proportion will be applied here
+
+            // Wyślij nową proporcję do innych użytkowników
+            TogetherJS.send({
+                type: 'resize-shape',
+                spriteId: sprite.id,
+                proportion: sprite.proportion
+            });
+
             startY = e.clientY; // Reset startY to allow smooth resizing
         }
     }
@@ -377,6 +385,18 @@ function makeSpriteDraggable(sprite) {
         sprite.style.transform = `rotate(${msg.angle}deg)`;
     });
 }
+
+// Listen for TogetherJS resize-shape event
+TogetherJS.hub.on('resize-shape', function (msg) {
+    if (!msg.sameUrl) return;
+    const sprite = document.getElementById(msg.spriteId);
+    if (sprite) {
+        sprite.proportion = msg.proportion;
+        resizeSprites();
+    } else {
+        console.warn(`Sprite with ID ${msg.spriteId} not found for resizing.`);
+    }
+});
 
 function resizeElement(sprite, initialWidth, initialHeight, proportion) {
     // Set the new dimensions while keeping the aspect ratio constant
