@@ -28,9 +28,9 @@ body {
     flex-direction: column;
     align-items: center;
     position: fixed;
-    bottom: 15px; /* Keep at the bottom */
-    right: 110px;  /* Positioned 15px to the left of the plus button (plus button is 30px wide) */
-    z-index: 1000; /* Ensure it stays above other elements */
+    bottom: 15px;
+    right: 110px;
+    z-index: 1000;
 }
 
 .color-picker {
@@ -47,8 +47,8 @@ body {
 /* Plus Button */
 .plus-button {
     position: fixed;
-    bottom: 10px;  /* Keep at the bottom */
-    right: 10px;   /* Positioned to the right of the viewport */
+    bottom: 10px;
+    right: 10px;
     z-index: 1000;
     cursor: pointer;
     background-size: cover;
@@ -59,12 +59,8 @@ body {
     background: url('board.svg') no-repeat center center;
     background-size: cover;
     position: relative;
-    width: 160vw;
-    height: 95vw;
-    max-width: 160vh;
-    max-height: 95vh;
     overflow: hidden;
-    z-index: 1; /* Lower z-index so sprites appear on top */
+    z-index: 1;
 }
 
 /* Sprite Styling */
@@ -74,7 +70,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 999; /* Higher z-index than the board */
+    z-index: 999;
     background-color: transparent;
     overflow: visible;
 }
@@ -92,11 +88,11 @@ body {
     position: absolute;
     bottom: -10px;
     cursor: pointer;
-    display: none; /* Initially hidden */
+    display: none;
     z-index: 100001;
-    width: 30px; /* Size of the control */
+    width: 30px;
     height: 30px;
-    background-size: contain; /* Ensure the image fits inside the element */
+    background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
 }
@@ -105,23 +101,23 @@ body {
     position: absolute;
     top: -10px;
     cursor: pointer;
-    display: none; /* Initially hidden */
+    display: none;
     z-index: 100001;
-    width: 30px; /* Size of the control */
+    width: 30px;
     height: 30px;
-    background-size: contain; /* Ensure the image fits inside the element */
+    background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .sprite .trashcan {
     right: -10px;
-    background-image: url('assets/trashcan.svg'); /* Path to the trashcan icon */
+    background-image: url('assets/trashcan.svg');
 }
 
 .sprite .rotation {
     left: -10px;
-    background-image: url('assets/rotation.svg'); /* Path to the rotation icon */
+    background-image: url('assets/rotation.svg');
 }
 
 .sprite .size {
@@ -133,7 +129,7 @@ body {
 .sprite:hover .trashcan,
 .sprite:hover .rotation,
 .sprite:hover .size {
-    display: block; /* Show icons on hover */
+    display: block;
 }
 
 /* Sprite Name Styling */
@@ -193,3 +189,34 @@ body {
     width: 100%;
     height: auto;
 }
+
+.sprite-name-input-inline {
+    position: absolute;
+    top: auto !important;
+    right: auto !important;
+
+    bottom: calc(100% + 5px);
+
+    left: 50%;
+    transform: translateX(-50%);
+
+    z-index: 1000;
+
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    padding: 2px 6px;
+    width: max-content;
+    min-width: 50px;
+    outline: none;
+}
+
+.sprite-name-input-inline:focus {
+    border-color: #666;
+}
+
+
+
